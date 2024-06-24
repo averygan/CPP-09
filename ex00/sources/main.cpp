@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 	{
 		arg_checker(argc, argv, input);
 		BitcoinExchange btc;
-		btc.getExchangeValues(input);
+		btc.getExchangeValues(input, btc);
 		input.close();
 	}
 	catch (std::exception &e)

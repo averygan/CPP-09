@@ -12,6 +12,7 @@
 
 #include "BitcoinExchange.hpp"
 
+/* Function to check if date is valid (inc leap year) */
 bool BitcoinExchange::is_valid_date(const std::string &str)
 {
 	// Check if date is valid
@@ -25,62 +26,49 @@ bool BitcoinExchange::is_valid_date(const std::string &str)
 	// Check days in month
 	static const int days_in_month[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 	// Check for leap year in February
-	if (month == 2) 
+	if (month == 2)
 	{
-		bool is_leap = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
-		if (is_leap)
-		{
-			if (day > 29) return false;
-		}
-		else 
-		{
-			if (day > 28) return false;
-		}
-	} 
-	if (day > days_in_month[month - 1]) 
-		return false;
+		bool is_leap = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
+		return (is_leap ? (day <= 29) : (day <= 28));
+	}
+	else
+	{
+		if (day > days_in_month[month - 1])
+			return false;
+	}
 	return true;
 }
 
-std::string BitcoinExchange::parseDate(const std::string &str)
+/* Function to parse date, return error for formatting, 
+invalid date or 
+date earlier than earliest date in _exchangeRates */
+std::string BitcoinExchange::parseDate(const std::string &str, const BitcoinExchange &btc)
 {
 	std::string date;
 
-	// Check syntax
-	if (str.length() < 10)
-	{
-		// std::cout << "date 1" << std::endl;
+	if (str.length() < 10 || str[4] != '-' || str[7] != '-')
 		return "";
-	}
-	if (str[4] != '-' || str[7] != '-') 
-	{
-		// std::cout << "date 2" << std::endl;
-		return "";
-	}
 	for (int i = 0; i < 10; ++i) 
 	{
 		if (!isdigit(str[i]) && (i != 4 && i != 7))
-		{
-			// std::cout << "date 3" << std::endl;
 			return "";
-		}
 	}
 	if (!is_valid_date(str))
-	{
-		// std::cout << "date 4" << std::endl;
 		return "";
-	}
+	std::string earliestDate = btc._exchangeRates.begin()->first;
+	if (str.substr(0, 10) < earliestDate)
+		return "";
 	return (str.substr(0, 10));
 }
 
-// Function to parse value and print formatting
+/* Function to check for formatting and if value is valid float and positive int */
 double BitcoinExchange::parseValue(const std::string row, const std::string date)
 {
 	char *end;
 
 	if (row.length() < 13 || row.substr(10, 3) != " | ")
 	{
-		std::cout << "Error: bad input => " << date << std::endl;
+		std::cout << "Error: bad input => " << row << std::endl;
 		return -1;
 	}
 	else
@@ -105,6 +93,22 @@ double BitcoinExchange::parseValue(const std::string row, const std::string date
 	return -1;
 }
 
+/* Function to get rate based on matched date or earlier date from _exchangeRates map */
+double BitcoinExchange::getRate(const std::string date, const BitcoinExchange &btc)
+{
+	std::map<std::string, double>::const_iterator it;
+	double exchange_rate;
+
+	for (it = btc._exchangeRates.begin(); it != btc._exchangeRates.end(); it++)
+	{
+		if (it->first <= date)
+			exchange_rate = it->second;
+		else
+			break;
+	}
+	return exchange_rate;
+}
+
 /* Read from db file and store exchange rates in container */
 int	BitcoinExchange::getExchangeRates()
 {
@@ -115,6 +119,8 @@ int	BitcoinExchange::getExchangeRates()
 	if (db.fail())
 		throw std::runtime_error("Error opening data.csv");
 	std::getline(db, row);
+	if (row != "date,exchange_rate")
+		throw std::runtime_error("Error: data.csv not in 'date,exchange_rate' format");
 	while (std::getline(db, row))
 	{
 		std::string key = splitString(true, ',', row);
@@ -132,18 +138,18 @@ int	BitcoinExchange::getExchangeRates()
 	return 0;
 }
 
-void	BitcoinExchange::getExchangeValues(std::ifstream &input)
+/* Function to parse each line of input and print date + exchange values */
+void	BitcoinExchange::getExchangeValues(std::ifstream &input, const BitcoinExchange &btc)
 {
 	std::string	row;
 
 	std::getline(input, row);
 	if (row != "date | value")
-		throw std::runtime_error("Format error: input file not in date | value format");
+		throw std::runtime_error("Error: input file not in date | value format");
 	while (std::getline(input, row))
 	{
 		// parse year and check if valid, parse values and check if within 0 - 1000
-		std::string date = parseDate(row);
-		// std::cout << "date is " << date << std::endl;
+		std::string date = parseDate(row, btc);
 		if (date.empty())
 		{
 			std::cout << "Error: bad input => " << row << std::endl;
@@ -152,13 +158,12 @@ void	BitcoinExchange::getExchangeValues(std::ifstream &input)
 		double value = parseValue(row, date);
 		if (value == -1)
 			continue ;
-		std::cout << std::endl;
-		// match date to exchange rates
-		// if valid, multiple value by exchange rate
-		// if invalid, throw error
+		// match date to exchange rates -> print value * exchange rate
+		std::cout << value * getRate(date, btc) << std::endl;
 	}
 }
 
+/* Helper function to check if string is a valid float and parse to double */
 double	BitcoinExchange::strToDouble(const std::string &str)
 {
 	char *end;
@@ -169,7 +174,7 @@ double	BitcoinExchange::strToDouble(const std::string &str)
 	return static_cast<double>(value);
 }
 
-
+/* Function to split string based on delimiter */
 std::string	BitcoinExchange::splitString(bool date, char delimiter, std::string row)
 {
 	size_t pos;
@@ -184,6 +189,8 @@ std::string	BitcoinExchange::splitString(bool date, char delimiter, std::string 
 BitcoinExchange::BitcoinExchange()
 {
 	this->getExchangeRates();
+	if (this->_exchangeRates.empty())
+		throw std::runtime_error("Error: exchange rate data is empty");
 }
 
 BitcoinExchange::BitcoinExchange(const BitcoinExchange &copy)
@@ -191,6 +198,7 @@ BitcoinExchange::BitcoinExchange(const BitcoinExchange &copy)
 	*this = copy;
 }
 
+// Destructor
 BitcoinExchange::~BitcoinExchange() {}
 
 BitcoinExchange &BitcoinExchange::operator=(const BitcoinExchange &copy)
