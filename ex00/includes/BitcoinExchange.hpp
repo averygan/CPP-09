@@ -43,13 +43,11 @@ class BitcoinExchange {
 
 		bool		is_valid_date(const std::string &str);
 		std::string parseDate(const std::string &str, const BitcoinExchange &btc);
+		std::string	splitString(bool date, char delimiter, std::string row);
 		int			getExchangeRates();
 		double		strToDouble(const std::string &str);
-		std::string	splitString(bool date, char delimiter, std::string row);
 		double		parseValue(const std::string row, const std::string date);
 		double 		getRate(const std::string date, const BitcoinExchange &btc);
-		void		getExchangeValues(std::ifstream &input, const BitcoinExchange &btc);
-
 
 	public:
 		// Constructors
@@ -61,6 +59,8 @@ class BitcoinExchange {
 
 		// Assignment operator
 		BitcoinExchange &operator=(const BitcoinExchange &copy);
+		
+		void		getExchangeValues(std::ifstream &input, const BitcoinExchange &btc);
 };
 
 #endif
