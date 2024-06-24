@@ -48,17 +48,61 @@ std::string BitcoinExchange::parseDate(const std::string &str)
 
 	// Check syntax
 	if (str.length() < 10)
-		return NULL;
+	{
+		// std::cout << "date 1" << std::endl;
+		return "";
+	}
 	if (str[4] != '-' || str[7] != '-') 
-		return NULL;
+	{
+		// std::cout << "date 2" << std::endl;
+		return "";
+	}
 	for (int i = 0; i < 10; ++i) 
 	{
-		if (!isdigit(date[i]) && i != 4 && i != 7)
-			return NULL;
+		if (!isdigit(str[i]) && (i != 4 && i != 7))
+		{
+			// std::cout << "date 3" << std::endl;
+			return "";
+		}
 	}
 	if (!is_valid_date(str))
-		return NULL;
+	{
+		// std::cout << "date 4" << std::endl;
+		return "";
+	}
 	return (str.substr(0, 10));
+}
+
+// Function to parse value and print formatting
+double BitcoinExchange::parseValue(const std::string row, const std::string date)
+{
+	char *end;
+
+	if (row.length() < 13 || row.substr(10, 3) != " | ")
+	{
+		std::cout << "Error: bad input => " << date << std::endl;
+		return -1;
+	}
+	else
+	{
+		float value = std::strtof(row.c_str() + 13, &end);
+		if (*end != '\0')
+			std::cout << "Error: invalid value => " << date << std::endl;
+		else
+		{
+			double d_value = static_cast<double>(value);
+			if (d_value < 0)
+				std::cout << "Error: not a positive number." << std::endl;
+			else if (d_value > 1000)
+				std::cout << "Error: too large a number." << std::endl;
+			else
+			{
+				std::cout << date << " => " << d_value << " = ";
+				return d_value;
+			}
+		}
+	}
+	return -1;
 }
 
 /* Read from db file and store exchange rates in container */
@@ -99,7 +143,17 @@ void	BitcoinExchange::getExchangeValues(std::ifstream &input)
 	{
 		// parse year and check if valid, parse values and check if within 0 - 1000
 		std::string date = parseDate(row);
-		// match year to exchange rates
+		// std::cout << "date is " << date << std::endl;
+		if (date.empty())
+		{
+			std::cout << "Error: bad input => " << row << std::endl;
+			continue ;
+		}
+		double value = parseValue(row, date);
+		if (value == -1)
+			continue ;
+		std::cout << std::endl;
+		// match date to exchange rates
 		// if valid, multiple value by exchange rate
 		// if invalid, throw error
 	}

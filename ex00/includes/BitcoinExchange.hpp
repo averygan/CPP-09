@@ -16,6 +16,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <cstring>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
@@ -45,6 +46,7 @@ class BitcoinExchange {
 		int			getExchangeRates();
 		double		strToDouble(const std::string &str);
 		std::string	splitString(bool date, char delimiter, std::string row);
+		double		parseValue(const std::string row, const std::string date);
 
 	public:
 		// Constructors
