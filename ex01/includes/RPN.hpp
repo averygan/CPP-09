@@ -15,6 +15,8 @@
 
 #include <iostream>
 #include <stack>
+#include <sstream>
+#include <cstdlib>
 
 // Colors
 # define BROWN "\033[1;33m"
@@ -46,6 +48,12 @@ class RPN {
 		int		size();
 		void	push(int n);
 		int		pop();
+		void	operation(std::string token, RPN &rpn);
+
+		class InfinityException : public std::exception {
+			public:
+				virtual const char *what() const throw();
+		};
 
 	private:
 		std::stack<int> _stack;

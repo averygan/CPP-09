@@ -32,6 +32,34 @@ int		RPN::pop()
 	return value;
 }
 
+const char *RPN::InfinityException::what() const throw()
+{
+	return ("Infinity");
+}
+
+void RPN::operation(std::string token, RPN &rpn)
+{
+	if (rpn.size() < 2)
+		throw std::runtime_error("Error: invalid operation");
+	int second = rpn.pop();
+	int first = rpn.pop();
+	int val;
+	if (token == "+" || token == "+ ")
+		val = first + second;
+	if (token == "-" || token == "- ")
+		val = first - second;
+	if (token == "/" || token == "/ ")
+	{
+		if (second == 0)
+			throw InfinityException();
+		else
+			val = first / second;
+	}
+	if (token == "*" || token == "* ")
+		val = first * second;
+	rpn.push(val);
+}
+
 RPN::RPN() {};
 
 RPN::RPN(const RPN &copy)
