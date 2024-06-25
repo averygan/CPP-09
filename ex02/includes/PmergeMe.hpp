@@ -1,22 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   RPN.hpp                                            :+:      :+:    :+:   */
+/*   PmergeMe.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: agan <marvin@42.fr>                        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/24 17:03:00 by agan              #+#    #+#             */
-/*   Updated: 2024/06/24 17:03:00 by agan             ###   ########.fr       */
+/*   Created: 2024/06/25 14:29:18 by agan              #+#    #+#             */
+/*   Updated: 2024/06/25 14:29:19 by agan             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef __RPN_HPP__
-#define __RPN_HPP__
+#ifndef __PMERGEME_HPP__
+#define __PMERGEME_HPP__
 
 #include <iostream>
-#include <stack>
-#include <sstream>
+#include <utility>
+#include <vector>
 #include <cstdlib>
+#include <list>
 
 // Colors
 # define BROWN "\033[1;33m"
@@ -32,37 +33,40 @@
 # define BLUE_R	"\033[34m"
 # define CYAN_R	"\033[36m"
 
-enum token_type 
+enum container 
 {
-	DIGIT,
-	SPACE,
-	OPERATOR
+	VECTOR,
+	LIST,
+	INVALID
 };
 
-class RPN {
+class PmergeMe {
 	public:
-		RPN();
-		RPN(const RPN &copy);
-		~RPN();
-		RPN &operator=(const RPN &copy);
+		PmergeMe();
+		PmergeMe(int *arr, container type, size_t size);
+		~PmergeMe();
+		PmergeMe(const PmergeMe &copy);
+		PmergeMe &operator=(const PmergeMe &copy);
 
-		void		ft_rpn(std::string input);
-
-		class InfinityException : public std::exception {
-			public:
-				virtual const char *what() const throw();
-		};
+		void sort();
 
 	private:
-		int			size();
-		void		push(int n);
-		int			pop();
-		void		operation(std::string token);
-		int 		get_digit(std::string token);
-		std::string get_next_token(const std::string &str);
-		token_type	get_token_type(std::string token);
-		
-		std::stack<int> _stack;
+		size_t		_size;
+		container 	_container;
+		// Containers of unsorted and sorted ints
+		std::vector<std::pair<int, int> > _vector;
+		std::vector<int> _sVector;
+		std::list<std::pair<int, int> > _list;
+		std::list<int> _sList;
+
+		// Member functions for sorting vector
+		void createVector(int *arr);
+		void sortVectorPairs();
+
+		// Member functions for sorting list
+
+		// For testing
+		void printContainer();
 };
 
 #endif
