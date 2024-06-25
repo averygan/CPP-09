@@ -35,6 +35,7 @@
 enum token_type 
 {
 	DIGIT,
+	SPACE,
 	OPERATOR
 };
 
@@ -45,10 +46,7 @@ class RPN {
 		~RPN();
 		RPN &operator=(const RPN &copy);
 
-		int		size();
-		void	push(int n);
-		int		pop();
-		void	operation(std::string token, RPN &rpn);
+		void		ft_rpn(std::string input);
 
 		class InfinityException : public std::exception {
 			public:
@@ -56,6 +54,13 @@ class RPN {
 		};
 
 	private:
+		int			size();
+		void		push(int n);
+		int			pop();
+		void		operation(std::string token);
+		int 		get_digit(std::string token);
+		std::string get_next_token(const std::string &str);
+		token_type	get_token_type(std::string token);
 		std::stack<int> _stack;
 };
 

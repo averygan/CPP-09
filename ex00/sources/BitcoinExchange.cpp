@@ -135,6 +135,8 @@ int	BitcoinExchange::getExchangeRates()
     //     std::cout << it->first << " -> " << it->second << std::endl;
     // }
 
+    db.close();
+
 	return 0;
 }
 
