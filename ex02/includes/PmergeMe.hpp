@@ -48,7 +48,7 @@ class PmergeMe {
 		PmergeMe(const PmergeMe &copy);
 		PmergeMe &operator=(const PmergeMe &copy);
 
-		void sort();
+		void mergeInsertionSort();
 
 	private:
 		size_t		_size;
@@ -62,11 +62,16 @@ class PmergeMe {
 		// Member functions for sorting vector
 		void createVector(int *arr);
 		void sortVectorPairs();
-
+		void merge(std::vector<std::pair<int, int> >&arr, int left, int mid, int right);
+		void createSequence();
+		// Overloaded mergeSort
+		void mergeSort(std::vector<std::pair<int, int> >&arr, int left, int right);
+	
 		// Member functions for sorting list
 
 		// For testing
 		void printContainer();
+		void printSorted();
 };
 
 #endif
