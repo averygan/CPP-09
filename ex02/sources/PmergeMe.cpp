@@ -47,10 +47,8 @@ void PmergeMe::mergeInsertionSort()
 	{
 		sortVectorPairs();
 		mergeSort(_vector, 0, _vector.size() - 1);
-		std::cout << "after:" << std::endl;
-		printContainer();
 		createSequence();
-		printSorted();
+		// printVector("sVector", this->_sVector);
 	}
 	// else if (this->container == LIST)
 	// 	mergeSort(_list);
@@ -71,27 +69,26 @@ std::vector<int> PmergeMe::createJacobsthal(size_t n)
 	std::vector<int>::iterator j;
 
 	int jacob_index = 3;
-	std::cout << "n is " << n << std::endl;
 	while (jacobsthal(jacob_index) < n - 1)
 	{
 		j_arr.push_back(this->jacobsthal(jacob_index));
 		jacob_index++;
 	}
 
-	// Print jacobsthal seq
-	std::cout << "printing jacob before" << std::endl;
-	for (j = j_arr.begin(); j != j_arr.end(); j++)
-	{
-		std::cout << "[" << *j << "]";
-	}
-	std::cout << std::endl << "end of jacob" << std::endl;
+	// // Print jacobsthal seq
+	// std::cout << "printing jacob before" << std::endl;
+	// for (j = j_arr.begin(); j != j_arr.end(); j++)
+	// {
+	// 	std::cout << "[" << *j << "]";
+	// }
+	// std::cout << std::endl << "end of jacob" << std::endl;
 
 	return j_arr;
 }
 
 void PmergeMe::getIndex(std::vector<int> &jacob)
 {
-	size_t val = 0;
+	size_t val = 1;
 	size_t prev_index = 1;
 	size_t curr_index = 1;
 
@@ -112,7 +109,6 @@ void PmergeMe::getIndex(std::vector<int> &jacob)
 	}
 	while (val++ < this->_pend.size())
 		this->_index.push_back(val);
-	printIndex();
 }
 
 int PmergeMe::binary_search(int n)
@@ -141,7 +137,6 @@ void PmergeMe::pushToMainChain(int straggler)
 	while (!this->_index.empty())
 	{
 		element = this->_pend.at(_index.front() - 1);
-		std::cout << "element is " << element << std::endl;
 		_index.erase(_index.begin());
 		mainIndex = binary_search(element);
 		_sVector.insert(_sVector.begin() + mainIndex, element);
@@ -156,7 +151,6 @@ void PmergeMe::pushToMainChain(int straggler)
 void PmergeMe::createSequence()
 {
 	std::vector<std::pair<int, int> >::iterator it;
-	std::vector<int>::iterator j;
 	std::vector<int> jacobsthal;
 	int straggler;
 
@@ -180,18 +174,12 @@ void PmergeMe::createSequence()
 
 	// Create jacobsthal
 	jacobsthal = createJacobsthal(_pend.size());
-
-	// Print jacobsthal seq
-	std::cout << "printing jacob" << std::endl;
-	for (j = jacobsthal.begin(); j != jacobsthal.end(); j++)
-	{
-		std::cout << "[" << *j << "]";
-	}
-	std::cout << std::endl << "end of jacob" << std::endl;
+	// Get index based on jacobsthal sequence
 	getIndex(jacobsthal);
-	printPend();
+	// printVector("sVector", this->_sVector);
+	// printVector("pend", this->_pend);
+	// printVector("index", this->_index);
 	pushToMainChain(straggler);
-	printIndex();
 }
 
 void PmergeMe::merge(std::vector<std::pair<int, int> >&arr, int left, int mid, int right)
@@ -257,58 +245,15 @@ void PmergeMe::mergeSort(std::vector<std::pair<int, int> >&arr, int left, int ri
 
 // Merge sort for lists
 
-void PmergeMe::printVector(std::string name, std::vector<int> vector)
+void PmergeMe::printVector(std::string name, const std::vector<int> vector)
 {
 	std::cout << "printing " << name << std::endl;
-	std::vector<int>::iterator i;
+	std::vector<int>::const_iterator i;
 	for (i = vector.begin(); i != vector.end(); i++)
 	{
 		std::cout << "[" << *i << "]";
 	}
 	std::cout << std::endl << "end of " << name << std::endl;
-}
-
-void PmergeMe::printSorted()
-{
-	std::cout << "printing sorted" << std::endl;
-	if (_container == VECTOR)
-	{
-		std::vector<int>::iterator i;
-		for (i = this->_sVector.begin(); i != this->_sVector.end(); i++)
-		{
-			std::cout << "[" << *i << "]" << std::endl;
-		}
-	}
-	// To add: list
-	std::cout << std::endl << "end of sorted" << std::endl;
-}
-
-void PmergeMe::printIndex()
-{
-	if (_container == VECTOR)
-	{
-		std::vector<int>::iterator i;
-		std::cout << "printing index" << std::endl;
-		for (i = this->_index.begin(); i != this->_index.end(); i++)
-		{
-			std::cout << "[" << *i << "]";
-		}
-		std::cout << std::endl << "end of index" << std::endl;
-	}	
-}
-
-void PmergeMe::printPend()
-{
-	std::cout << "printing pend" << std::endl;
-	if (_container == VECTOR)
-	{
-		std::vector<int>::iterator i;
-		for (i = this->_pend.begin(); i != this->_pend.end(); i++)
-		{
-			std::cout << "[" << *i << "]" << std::endl;
-		}		
-	}
-	std::cout << "pend end" << std::endl;
 }
 
 void PmergeMe::printContainer()
