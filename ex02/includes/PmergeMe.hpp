@@ -79,6 +79,26 @@ class PmergeMe {
 		std::list<std::pair<int, int> > _list;
 		std::list<int> _sList;
 		std::list<int> _lpend;
+		std::list<int> _lindex;
+		
+		// Create list and pairs
+		void createList(int *arr);
+		void sortListPairs();
+		// Merge sort function
+		void merge(std::list<std::pair<int, int> >::iterator left, \
+				std::list<std::pair<int, int> >::iterator mid, \
+				std::list<std::pair<int, int> >::iterator right);
+		void mergeSort(std::list<std::pair<int, int> >& lst, \
+				std::list<std::pair<int, int> >::iterator left, \
+				std::list<std::pair<int, int> >::iterator right);
+		// Function to create sequence
+		void createListSequence();
+		// Jacobsthal func
+		std::list<int> createJacobsthalList(size_t n);
+		// Get index of pend elements to be inserted to main chain
+		void getIndex(std::list<int> &jacob);
+		int	binarySearchList(int n);
+		void pushToMainChainList(int straggler);
 
 		/* Common functions */
 		size_t	jacobsthal(int n);
@@ -86,6 +106,7 @@ class PmergeMe {
 		// For testing
 		void	printContainer();
 		void	printVector(std::string name, std::vector<int> vector);
+		void 	printList(std::string name, const std::list<int> list);
 
 };
 

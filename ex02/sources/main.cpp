@@ -14,7 +14,10 @@
 
 int main(void)
 {
-	int arr[9] = {0, 12, 90, 8, 1, 20, 40, 12, 100};
-	PmergeMe test = PmergeMe(arr, VECTOR, 9);
+	int arr[9] = {0, 12, 90, 8, 1, 14, 40, 88, 100};
+	PmergeMe test = PmergeMe(arr, LIST, 9);
+
+	// int arr[18] = {0, 12, 90, 8, 1, 20, 40, 12, 100, 0, 12, 90, 8, 1, 20, 40, 12, 100};
+	// PmergeMe test = PmergeMe(arr, LIST, 18);
 	test.mergeInsertionSort();
 }

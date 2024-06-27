@@ -20,10 +20,10 @@ PmergeMe::PmergeMe(int *arr, container type, size_t size) : _size(size), _contai
 	{
 		this->createVector(arr);
 	}
-	// else if (_container == LIST)
-	// {
-	// 	createList(int *arr);
-	// }
+	else if (_container == LIST)
+	{
+		this->createList(arr);
+	}
 	else
 		throw std::runtime_error("Error: invalid container");
 }
@@ -52,8 +52,14 @@ void PmergeMe::mergeInsertionSort()
 		createSequence();
 		// printVector("sVector", this->_sVector);
 	}
-	// else if (this->container == LIST)
-	// 	mergeSort(_list);
+	else if (this->_container == LIST)
+	{
+		sortListPairs();
+		mergeSort(_list, _list.begin(), _list.end());
+		printContainer();
+		createListSequence();
+		printList("sorted list", this->_sList);
+	}
 }
 
 size_t PmergeMe::jacobsthal(int n)
@@ -104,30 +110,21 @@ void PmergeMe::sortVectorPairs()
 			it->second = tmp;
 		}
 	}
-	printContainer();
+	// printContainer();
 }
 
 std::vector<int> PmergeMe::createJacobsthal(size_t n)
 {
-	std::vector<int> j_arr;
-	std::vector<int>::iterator j;
+	std::vector<int> jacob;
 
 	int jacob_index = 3;
 	while (jacobsthal(jacob_index) < n - 1)
 	{
-		j_arr.push_back(this->jacobsthal(jacob_index));
+		jacob.push_back(this->jacobsthal(jacob_index));
 		jacob_index++;
 	}
 
-	// // Print jacobsthal seq
-	// std::cout << "printing jacob before" << std::endl;
-	// for (j = j_arr.begin(); j != j_arr.end(); j++)
-	// {
-	// 	std::cout << "[" << *j << "]";
-	// }
-	// std::cout << std::endl << "end of jacob" << std::endl;
-
-	return j_arr;
+	return jacob;
 }
 
 void PmergeMe::getIndex(std::vector<int> &jacob)
@@ -289,25 +286,270 @@ void PmergeMe::mergeSort(std::vector<std::pair<int, int> >&arr, int left, int ri
 
 /* ----------------------- List functions ----------------------- */
 
-// void PmergeMe::createList(int *arr)
-// {
-// }
+void PmergeMe::createList(int *arr)
+{	
+	size_t j = 0;
+	bool straggler = (this->_size % 2);
+
+	for (size_t i = 0; i < this->_size / 2; i++)
+	{
+		if (straggler && j == this->_size - 1)
+			break ;
+		std::pair<int, int> _pair;
+		_pair.first = arr[j];
+		_pair.second = arr[j + 1];
+		this->_list.push_back(_pair);
+		j += 2;
+	}
+	if (straggler)
+	{
+		std::pair<int, int> _pair;
+		_pair.first = arr[j];
+		_pair.second = -1;
+		this->_list.push_back(_pair);
+	}
+}
+
+void PmergeMe::sortListPairs()
+{
+	std::list<std::pair<int, int> >::iterator it;
+	for (it = this->_list.begin(); it != this->_list.end(); it++)
+	{
+		if (it->first < it->second)
+		{
+			int tmp = it->first;
+			it->first = it->second;
+			it->second = tmp;
+		}
+	}
+	printContainer();
+}
+
+void PmergeMe::merge(std::list<std::pair<int, int> >::iterator left, \
+	std::list<std::pair<int, int> >::iterator mid, \
+	std::list<std::pair<int, int> >::iterator right)
+{
+	// Create tmp lists
+	std::list<std::pair<int, int> > L(left, mid);
+	std::list<std::pair<int, int> > R(mid, right);
+
+    std::list<std::pair<int, int> >::iterator leftIter = L.begin();
+    std::list<std::pair<int, int> >::iterator rightIter = R.begin();
+    std::list<std::pair<int, int> >::iterator lstIter = left;
+
+	// Merge temporary lists back into lst
+	while (leftIter != L.end() && rightIter != R.end())
+	{
+		if (leftIter->first <= rightIter->first)
+		{
+			*lstIter = *leftIter;
+			leftIter++;
+		}
+		else
+		{
+			*lstIter = *rightIter;
+			rightIter++;
+		}
+		lstIter++;
+	}
+	// Copy remaining nodes
+	while (leftIter != L.end())
+	{
+		*lstIter = *leftIter;
+		leftIter++;
+		lstIter++;
+	}
+	while (rightIter != R.end())
+	{
+		*lstIter = *rightIter;
+		rightIter++;
+		lstIter++;
+	}
+}
+
+// Merge sort for vectors
+void PmergeMe::mergeSort(std::list<std::pair<int, int> >& lst, \
+		std::list<std::pair<int, int> >::iterator left, \
+		std::list<std::pair<int, int> >::iterator right)
+{
+	if (std::distance(left, right) <= 1)
+		return;
+
+	std::list<std::pair<int, int> >::iterator mid = left;
+	std::advance(mid, std::distance(left, right) / 2);
+
+	// Sort both halves
+	mergeSort(lst, left, mid);
+	mergeSort(lst, mid, right);
+
+	// Merge sorted halves
+	merge(left, mid, right);
+}
+
+void PmergeMe::createListSequence()
+{
+	std::list<std::pair<int, int> >::iterator it;
+	std::list<int> jacobsthal;
+	int straggler;
+
+	straggler = -1;
+	// Create sequence and pend
+	for (it = this->_list.begin(); it != this->_list.end(); it++)
+	{
+		if (it->second == -1)
+			straggler = it->first;
+		else
+		{
+			_sList.push_back(it->first);
+			_lpend.push_back(it->second);	
+		}
+	}
+
+	// Push first el in pend to sequence
+	if (_lpend.empty())
+		return;
+	_sList.push_front(_lpend.front());
+
+	// Create jacobsthal
+	jacobsthal = createJacobsthalList(_lpend.size());
+	// Get index based on jacobsthal sequence
+	getIndex(jacobsthal);
+	printList("_sList", this->_sList);
+	printList("_lpend", this->_lpend);
+	pushToMainChainList(straggler);
+}
+
+std::list<int> PmergeMe::createJacobsthalList(size_t n)
+{
+	std::list<int> jacob;
+
+	int jacob_index = 3;
+	while (jacobsthal(jacob_index) < n - 1)
+	{
+		jacob.push_back(this->jacobsthal(jacob_index));
+		jacob_index++;
+	}
+
+	printList("jacobsthal", jacob);
+	return jacob;
+}
+
+void PmergeMe::getIndex(std::list<int> &jacob)
+{
+	size_t val = 1;
+	size_t prev_index = 1;
+	size_t curr_index = 1;
+
+	if (this->_lpend.empty())
+		return ;
+	while (!jacob.empty())
+	{
+		val = jacob.front();
+		this->_lindex.push_back(val);
+		curr_index = val - 1;
+		while (curr_index > prev_index)
+		{
+			this->_lindex.push_back(curr_index);
+			curr_index--;
+		}
+		prev_index = val;
+		jacob.pop_front();
+	}
+	while (val++ < this->_lpend.size())
+		this->_lindex.push_back(val);
+
+	// printList("index", _lindex);
+}
+
+int PmergeMe::binarySearchList(int n)
+{
+	int low = 0;
+	int high = _sList.size();
+
+	std::list<int>::iterator itLow = _sList.begin();
+	std::list<int>::iterator itHigh = _sList.end();
+
+	while (low < high)
+	{
+		int mid = low + std::distance(itLow, itHigh) / 2;
+
+		std::list<int>::iterator itMid = itLow;
+		std::advance(itMid, mid);
+
+		if (n < *itMid)
+		{
+			itHigh = itMid;
+			high = mid;
+		}
+		else
+		{
+			itLow = ++itMid;
+			low = mid + 1;
+		}
+	}
+	return low;
+}
+
+// Push to main chain based on indexed seq using binary search
+void PmergeMe::pushToMainChainList(int straggler)
+{
+	int element;
+	int mainIndex;
+	std::list<int>::iterator it;
+	std::list<int>::iterator mainIt;
+
+	while (!this->_lindex.empty())
+	{
+		// Get element from lpend
+		it = _lpend.begin();
+		std::advance(it, _lindex.front());
+		element = *it;
+		// Remote index from front of lindex
+		_lindex.pop_front();
+		// Search for insertion index in main chain
+		mainIndex = binarySearchList(element);
+		// Advance and insert
+		mainIt = _sList.begin();
+		std::advance(mainIt, mainIndex);
+		_sList.insert(mainIt, element);
+	}
+	if (straggler != -1)
+	{
+		mainIndex = binarySearchList(straggler);
+		std::cout << "mainindex is " << mainIndex << std::endl;
+		mainIt = _sList.begin();
+		std::advance(mainIt, mainIndex);
+		_sList.insert(mainIt, straggler);
+	}
+}
 
 /* ----------------------- Debugging functions ----------------------- */
 
 void PmergeMe::printVector(std::string name, const std::vector<int> vector)
 {
-	std::cout << "printing " << name << std::endl;
+	std::cout << GREEN << "printing " << name << RESET << std::endl;
 	std::vector<int>::const_iterator i;
 	for (i = vector.begin(); i != vector.end(); i++)
 	{
 		std::cout << "[" << *i << "]";
 	}
-	std::cout << std::endl << "end of " << name << std::endl;
+	std::cout << GREEN << std::endl << "end of " << name << RESET << std::endl;
+}
+
+void PmergeMe::printList(std::string name, const std::list<int> list)
+{
+	std::cout << GREEN << "printing " << name << RESET << std::endl;
+	std::list<int>::const_iterator i;
+	for (i = list.begin(); i != list.end(); i++)
+	{
+		std::cout << "[" << *i << "]";
+	}
+	std::cout << GREEN << std::endl << "end of " << name << RESET << std::endl;
 }
 
 void PmergeMe::printContainer()
 {
+	std::cout << CYAN << "printing container" << RESET << std::endl;
 	if (_container == VECTOR)
 	{
 		std::vector<std::pair<int, int> >::iterator i;
@@ -316,6 +558,14 @@ void PmergeMe::printContainer()
 			std::cout << "pair: [" << i->first << "] [" << i->second << "]" << std::endl;
 		}
 	}
-	// To add: list
+	else if (_container == LIST)
+	{
+		std::list<std::pair<int, int> >::iterator i;
+		for (i = this->_list.begin(); i != this->_list.end(); i++)
+		{
+			std::cout << "pair: [" << i->first << "] [" << i->second << "]" << std::endl;
+		}
+	}
+	std::cout << CYAN << "end of container" << RESET << std::endl;
 }
 
