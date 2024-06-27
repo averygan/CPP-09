@@ -53,25 +53,43 @@ class PmergeMe {
 	private:
 		size_t		_size;
 		container 	_container;
-		// Containers of unsorted and sorted ints
+		/* Vector functions */
 		std::vector<std::pair<int, int> > _vector;
 		std::vector<int> _sVector;
+		std::vector<int> _pend;
+		std::vector<int> _index;
+
+		// Create vector and pairs
+		void	createVector(int *arr);
+		void	sortVectorPairs();
+		// Merge sort function to recursively sort pairs
+		void	mergeSort(std::vector<std::pair<int, int> >&arr, int left, int right);
+		void	merge(std::vector<std::pair<int, int> >&arr, int left, int mid, int right);
+		// Function to create sequence
+		void	createSequence();
+		// Jacobsthal functions
+		std::vector<int> createJacobsthal(size_t n);
+		// Get index of pend elements to be inserted to main chain
+		void	getIndex(std::vector<int> &jacob);
+		int		binary_search(int n);
+		// Push to main chain
+		void	pushToMainChain(int straggler);
+
+		/* List functions */
 		std::list<std::pair<int, int> > _list;
 		std::list<int> _sList;
+		std::list<int> _lpend;
 
-		// Member functions for sorting vector
-		void createVector(int *arr);
-		void sortVectorPairs();
-		void merge(std::vector<std::pair<int, int> >&arr, int left, int mid, int right);
-		void createSequence();
-		// Overloaded mergeSort
-		void mergeSort(std::vector<std::pair<int, int> >&arr, int left, int right);
-	
-		// Member functions for sorting list
+		/* Common functions */
+		size_t	jacobsthal(int n);
 
 		// For testing
-		void printContainer();
-		void printSorted();
+		void	printContainer();
+		void	printSorted();
+		void 	printPend();
+		void	printIndex();
+		void	printVector(std::string name, std::vector<int> vector);
+
 };
 
 #endif
