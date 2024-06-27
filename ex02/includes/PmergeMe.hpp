@@ -53,7 +53,7 @@ class PmergeMe {
 	private:
 		size_t		_size;
 		container 	_container;
-		/* Vector functions */
+		/* ----------------------- Vector functions ----------------------- */
 		std::vector<std::pair<int, int> > _vector;
 		std::vector<int> _sVector;
 		std::vector<int> _pend;
@@ -71,11 +71,11 @@ class PmergeMe {
 		std::vector<int> createJacobsthal(size_t n);
 		// Get index of pend elements to be inserted to main chain
 		void	getIndex(std::vector<int> &jacob);
-		int		binary_search(int n);
+		int		binarySearch(int n);
 		// Push to main chain
 		void	pushToMainChain(int straggler);
 
-		/* List functions */
+		/* ----------------------- List functions ----------------------- */
 		std::list<std::pair<int, int> > _list;
 		std::list<int> _sList;
 		std::list<int> _lpend;
@@ -85,9 +85,6 @@ class PmergeMe {
 
 		// For testing
 		void	printContainer();
-		void	printSorted();
-		void 	printPend();
-		void	printIndex();
 		void	printVector(std::string name, std::vector<int> vector);
 
 };

@@ -41,6 +41,8 @@ PmergeMe &PmergeMe::operator=(const PmergeMe &copy)
 	return *this;
 }
 
+/* ----------------------- Common functions ----------------------- */
+
 void PmergeMe::mergeInsertionSort()
 {
 	if (this->_container == VECTOR)
@@ -61,6 +63,48 @@ size_t PmergeMe::jacobsthal(int n)
 	if (n == 1)
 		return 1;
 	return (jacobsthal(n - 1) + 2 * jacobsthal(n - 2));
+}
+
+/* ----------------------- Vector functions ----------------------- */
+
+void PmergeMe::createVector(int *arr)
+{	
+	size_t j = 0;
+	bool straggler = (this->_size % 2);
+
+	for (size_t i = 0; i < this->_size / 2; i++)
+	{
+		if (straggler && j == this->_size - 1)
+			break ;
+		std::pair<int, int> _pair;
+		_pair.first = arr[j];
+		_pair.second = arr[j + 1];
+		this->_vector.push_back(_pair);
+		j += 2;
+	}
+	if (straggler)
+	{
+		std::pair<int, int> _pair;
+		_pair.first = arr[j];
+		_pair.second = -1;
+		this->_vector.push_back(_pair);
+	}
+	// printContainer();
+}
+
+void PmergeMe::sortVectorPairs()
+{
+	std::vector<std::pair<int, int> >::iterator it;
+	for (it = this->_vector.begin(); it != this->_vector.end(); it++)
+	{
+		if (it->first < it->second)
+		{
+			int tmp = it->first;
+			it->first = it->second;
+			it->second = tmp;
+		}
+	}
+	printContainer();
 }
 
 std::vector<int> PmergeMe::createJacobsthal(size_t n)
@@ -111,7 +155,7 @@ void PmergeMe::getIndex(std::vector<int> &jacob)
 		this->_index.push_back(val);
 }
 
-int PmergeMe::binary_search(int n)
+int PmergeMe::binarySearch(int n)
 {
 	int low = 0;
 	int high = _sVector.size();
@@ -138,12 +182,12 @@ void PmergeMe::pushToMainChain(int straggler)
 	{
 		element = this->_pend.at(_index.front() - 1);
 		_index.erase(_index.begin());
-		mainIndex = binary_search(element);
+		mainIndex = binarySearch(element);
 		_sVector.insert(_sVector.begin() + mainIndex, element);
 	}
 	if (straggler != -1)
 	{
-		mainIndex = binary_search(straggler);
+		mainIndex = binarySearch(straggler);
 		_sVector.insert(_sVector.begin() + mainIndex, straggler);
 	}
 }
@@ -243,7 +287,13 @@ void PmergeMe::mergeSort(std::vector<std::pair<int, int> >&arr, int left, int ri
 	merge(arr, left, mid, right);
 }
 
-// Merge sort for lists
+/* ----------------------- List functions ----------------------- */
+
+// void PmergeMe::createList(int *arr)
+// {
+// }
+
+/* ----------------------- Debugging functions ----------------------- */
 
 void PmergeMe::printVector(std::string name, const std::vector<int> vector)
 {
@@ -269,46 +319,3 @@ void PmergeMe::printContainer()
 	// To add: list
 }
 
-void PmergeMe::sortVectorPairs()
-{
-	std::vector<std::pair<int, int> >::iterator it;
-	for (it = this->_vector.begin(); it != this->_vector.end(); it++)
-	{
-		if (it->first < it->second)
-		{
-			int tmp = it->first;
-			it->first = it->second;
-			it->second = tmp;
-		}
-	}
-	printContainer();
-}
-
-void PmergeMe::createVector(int *arr)
-{	
-	size_t j = 0;
-	bool straggler = (this->_size % 2);
-
-	for (size_t i = 0; i < this->_size / 2; i++)
-	{
-		if (straggler && j == this->_size - 1)
-			break ;
-		std::pair<int, int> _pair;
-		_pair.first = arr[j];
-		_pair.second = arr[j + 1];
-		this->_vector.push_back(_pair);
-		j += 2;
-	}
-	if (straggler)
-	{
-		std::pair<int, int> _pair;
-		_pair.first = arr[j];
-		_pair.second = -1;
-		this->_vector.push_back(_pair);
-	}
-	// printContainer();
-}
-
-// void PmergeMe::createList(int *arr)
-// {
-// }
