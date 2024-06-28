@@ -257,7 +257,6 @@ int PmergeMe::binarySearch(int n)
 		else
 			low = mid + 1;
 	}
-	// std::cout << "low is " << low << std::endl;
 	return low;
 }
 
@@ -612,7 +611,6 @@ void PmergeMe::pushToMainChainList(int straggler)
 		mainIt = _sList.begin();
 		std::advance(mainIt, mainIndex);
 		_sList.insert(mainIt, element);
-		// printList("list", _sList);
 	}
 	if (straggler != -1)
 	{
