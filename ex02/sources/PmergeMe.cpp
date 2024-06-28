@@ -37,28 +37,68 @@ PmergeMe::PmergeMe(const PmergeMe &copy)
 
 PmergeMe &PmergeMe::operator=(const PmergeMe &copy)
 {
-	(void)copy;
+	if (this != &copy)
+	{
+		this->_size = copy._size;
+		this->_container = copy._container;
+		if (_container == VECTOR)
+		{
+			_vector = copy._vector;
+			_usVector = copy._usVector;
+			_sVector = copy._sVector;
+			_pend = copy._pend;
+			_index = copy._index;
+		}
+		else if (_container == LIST)
+		{
+			_list = copy._list;
+			_sList = copy._sList;
+			_lpend = copy._lpend;
+			_lindex = copy._lindex;			
+		}
+	}
 	return *this;
 }
 
 /* ----------------------- Common functions ----------------------- */
 
-void PmergeMe::mergeInsertionSort()
+void PmergeMe::printDuration()
+{
+	std::string container;
+
+	if (this->_container == LIST)
+		container = "list";
+	else if (this->_container == VECTOR)
+		container = "vector";
+
+	double duration = (double(_end - _start) / CLOCKS_PER_SEC) * 1000000;
+	std::cout << "Time to process a range of " << this->_size << " elements" << \
+	" with std::" << container << " : " << duration << " us" << std::endl;
+}
+
+void PmergeMe::mergeInsertionSort(int *arr)
 {
 	if (this->_container == VECTOR)
 	{
+		this->_start = std::clock();
+		createVectorPairs(arr);
 		sortVectorPairs();
 		mergeSort(_vector, 0, _vector.size() - 1);
 		createSequence();
-		// printVector("sVector", this->_sVector);
+		if (!isSorted(_sVector))
+			throw std::runtime_error("Not Sorted!");
+		this->_end = std::clock();
 	}
 	else if (this->_container == LIST)
 	{
+		this->_start = std::clock();
+		createListPairs(arr);
 		sortListPairs();
 		mergeSort(_list, _list.begin(), _list.end());
-		printContainer();
 		createListSequence();
-		printList("sorted list", this->_sList);
+		if (!isSorted(_sList))
+			throw std::runtime_error("Not Sorted!");
+		this->_end = std::clock();
 	}
 }
 
@@ -71,9 +111,59 @@ size_t PmergeMe::jacobsthal(int n)
 	return (jacobsthal(n - 1) + 2 * jacobsthal(n - 2));
 }
 
+void PmergeMe::printSorted()
+{
+	std::cout << "After:  ";
+	if (_container == VECTOR)
+	{
+		std::vector<int>::iterator it;
+		for (it = _sVector.begin(); it != _sVector.end(); it++)
+		{
+			std::cout << *it << " ";
+		}
+	}
+	else if (_container == LIST)
+	{
+		std::list<int>::iterator it;
+		for (it = _sList.begin(); it != _sList.end(); it++)
+		{
+			std::cout << *it << " ";
+		}
+	}
+	std::cout << std::endl;
+}
+
 /* ----------------------- Vector functions ----------------------- */
 
+
+bool PmergeMe::isSorted(const std::vector<int>vector)
+{
+	std::vector<int>::const_iterator it;
+	if (vector.empty())
+		return true;
+
+	int num = vector.front();
+	for (it = vector.begin(); it != vector.end(); it++)
+	{
+		if (*it < num)
+			return false;
+		else if (*it > num)
+			num = *it;
+	}
+	return true;
+}
+
+// Create vector pairs
 void PmergeMe::createVector(int *arr)
+{	
+	for (size_t i = 0; i < this->_size; i++)
+	{
+		this->_usVector.push_back(arr[i]);
+	}
+}
+
+// Create vector pairs
+void PmergeMe::createVectorPairs(int *arr)
 {	
 	size_t j = 0;
 	bool straggler = (this->_size % 2);
@@ -150,6 +240,7 @@ void PmergeMe::getIndex(std::vector<int> &jacob)
 	}
 	while (val++ < this->_pend.size())
 		this->_index.push_back(val);
+	// printVector("index", _index);
 }
 
 int PmergeMe::binarySearch(int n)
@@ -166,6 +257,7 @@ int PmergeMe::binarySearch(int n)
 		else
 			low = mid + 1;
 	}
+	// std::cout << "low is " << low << std::endl;
 	return low;
 }
 
@@ -288,6 +380,14 @@ void PmergeMe::mergeSort(std::vector<std::pair<int, int> >&arr, int left, int ri
 
 void PmergeMe::createList(int *arr)
 {	
+	for (size_t i = 0; i < this->_size; i++)
+	{
+		_usList.push_back(arr[i]);
+	}
+}
+
+void PmergeMe::createListPairs(int *arr)
+{	
 	size_t j = 0;
 	bool straggler = (this->_size % 2);
 
@@ -322,7 +422,7 @@ void PmergeMe::sortListPairs()
 			it->second = tmp;
 		}
 	}
-	printContainer();
+	// printContainer();
 }
 
 void PmergeMe::merge(std::list<std::pair<int, int> >::iterator left, \
@@ -414,8 +514,8 @@ void PmergeMe::createListSequence()
 	jacobsthal = createJacobsthalList(_lpend.size());
 	// Get index based on jacobsthal sequence
 	getIndex(jacobsthal);
-	printList("_sList", this->_sList);
-	printList("_lpend", this->_lpend);
+	// printList("_sList", this->_sList);
+	// printList("_lpend", this->_lpend);
 	pushToMainChainList(straggler);
 }
 
@@ -430,7 +530,6 @@ std::list<int> PmergeMe::createJacobsthalList(size_t n)
 		jacob_index++;
 	}
 
-	printList("jacobsthal", jacob);
 	return jacob;
 }
 
@@ -458,7 +557,7 @@ void PmergeMe::getIndex(std::list<int> &jacob)
 	while (val++ < this->_lpend.size())
 		this->_lindex.push_back(val);
 
-	// printList("index", _lindex);
+	// printList("lindex", _lindex);
 }
 
 int PmergeMe::binarySearchList(int n)
@@ -468,12 +567,12 @@ int PmergeMe::binarySearchList(int n)
 
 	std::list<int>::iterator itLow = _sList.begin();
 	std::list<int>::iterator itHigh = _sList.end();
+	std::advance(itHigh, -1);
 
 	while (low < high)
 	{
 		int mid = low + std::distance(itLow, itHigh) / 2;
-
-		std::list<int>::iterator itMid = itLow;
+		std::list<int>::iterator itMid = _sList.begin();
 		std::advance(itMid, mid);
 
 		if (n < *itMid)
@@ -483,7 +582,8 @@ int PmergeMe::binarySearchList(int n)
 		}
 		else
 		{
-			itLow = ++itMid;
+			itLow = itMid;
+			itLow++;
 			low = mid + 1;
 		}
 	}
@@ -502,9 +602,9 @@ void PmergeMe::pushToMainChainList(int straggler)
 	{
 		// Get element from lpend
 		it = _lpend.begin();
-		std::advance(it, _lindex.front());
+		std::advance(it, _lindex.front() - 1);
 		element = *it;
-		// Remote index from front of lindex
+		// Remove index from front of lindex
 		_lindex.pop_front();
 		// Search for insertion index in main chain
 		mainIndex = binarySearchList(element);
@@ -512,15 +612,32 @@ void PmergeMe::pushToMainChainList(int straggler)
 		mainIt = _sList.begin();
 		std::advance(mainIt, mainIndex);
 		_sList.insert(mainIt, element);
+		// printList("list", _sList);
 	}
 	if (straggler != -1)
 	{
 		mainIndex = binarySearchList(straggler);
-		std::cout << "mainindex is " << mainIndex << std::endl;
 		mainIt = _sList.begin();
 		std::advance(mainIt, mainIndex);
 		_sList.insert(mainIt, straggler);
 	}
+}
+
+bool PmergeMe::isSorted(const std::list<int>list)
+{
+	std::list<int>::const_iterator it;
+	if (list.empty())
+		return true;
+
+	int num = list.front();
+	for (it = list.begin(); it != list.end(); it++)
+	{
+		if (*it < num)
+			return false;
+		else if (*it > num)
+			num = *it;
+	}
+	return true;
 }
 
 /* ----------------------- Debugging functions ----------------------- */
