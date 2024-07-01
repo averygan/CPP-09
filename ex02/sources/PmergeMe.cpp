@@ -117,7 +117,8 @@ void PmergeMe::printSorted()
 	if (_container == VECTOR)
 	{
 		std::vector<int>::iterator it;
-		for (it = _sVector.begin(); it != _sVector.end(); it++)
+		for (it = _sVector.begin(); it != _
+			sVector.end(); it++)
 		{
 			std::cout << *it << " ";
 		}
@@ -308,9 +309,6 @@ void PmergeMe::createSequence()
 	jacobsthal = createJacobsthal(_pend.size());
 	// Get index based on jacobsthal sequence
 	getIndex(jacobsthal);
-	// printVector("sVector", this->_sVector);
-	// printVector("pend", this->_pend);
-	// printVector("index", this->_index);
 	pushToMainChain(straggler);
 }
 
@@ -513,8 +511,6 @@ void PmergeMe::createListSequence()
 	jacobsthal = createJacobsthalList(_lpend.size());
 	// Get index based on jacobsthal sequence
 	getIndex(jacobsthal);
-	// printList("_sList", this->_sList);
-	// printList("_lpend", this->_lpend);
 	pushToMainChainList(straggler);
 }
 
