@@ -117,8 +117,7 @@ void PmergeMe::printSorted()
 	if (_container == VECTOR)
 	{
 		std::vector<int>::iterator it;
-		for (it = _sVector.begin(); it != _
-			sVector.end(); it++)
+		for (it = _sVector.begin(); it != _sVector.end(); it++)
 		{
 			std::cout << *it << " ";
 		}
