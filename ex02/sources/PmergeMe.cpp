@@ -52,10 +52,13 @@ PmergeMe &PmergeMe::operator=(const PmergeMe &copy)
 		else if (_container == LIST)
 		{
 			_list = copy._list;
+			_usList = copy._usList;
 			_sList = copy._sList;
 			_lpend = copy._lpend;
 			_lindex = copy._lindex;			
 		}
+		_start = copy._start;
+		_end = copy._end;
 	}
 	return *this;
 }
