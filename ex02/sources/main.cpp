@@ -22,7 +22,7 @@ int *parse_args(int argc, char **argv)
 {
 	int *arr = new int[argc - 1];
 
-	for (int i = 1; i < argc; i++)
+	for (int i = 1, j = 0; i < argc; i++, j++)
 	{
 		std::stringstream ss(argv[i]);
 		int num;
@@ -37,7 +37,7 @@ int *parse_args(int argc, char **argv)
 		{
 			if (num < 0)
 				throw std::invalid_argument("Error: non-positive integer");
-			arr[i] = num;
+			arr[j] = num;
 		}
 	}
 	return arr;
@@ -62,8 +62,8 @@ int main(int argc, char **argv)
 		printBefore(argc - 1, arr);
 
 		PmergeMe vector = PmergeMe(arr, VECTOR, argc - 1);
-		PmergeMe list = PmergeMe(arr, LIST, argc - 1);
 		vector.mergeInsertionSort(arr);
+		PmergeMe list = PmergeMe(arr, LIST, argc - 1);
 		list.mergeInsertionSort(arr);
 
 		list.printSorted();

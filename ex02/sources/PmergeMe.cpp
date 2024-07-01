@@ -73,7 +73,7 @@ void PmergeMe::printDuration()
 
 	double duration = (double(_end - _start) / CLOCKS_PER_SEC) * 1000000;
 	std::cout << "Time to process a range of " << this->_size << " elements" << \
-	" with std::" << container << " : " << duration << " us" << std::endl;
+	" with std::" << container << " : " << std::fixed << std::setprecision(6) << duration << " us" << std::endl;
 }
 
 void PmergeMe::mergeInsertionSort(int *arr)

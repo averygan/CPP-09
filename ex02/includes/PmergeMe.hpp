@@ -20,6 +20,7 @@
 #include <list>
 #include <sstream>
 #include <ctime>
+#include <iomanip>
 
 // Colors
 # define BROWN "\033[1;33m"
@@ -93,7 +94,6 @@ class PmergeMe {
 		// Create list and pairs
 		void createList(int *arr);
 		void createListPairs(int *arr);
-
 		void sortListPairs();
 		// Merge sort function
 		void merge(std::list<std::pair<int, int> >::iterator left, \
